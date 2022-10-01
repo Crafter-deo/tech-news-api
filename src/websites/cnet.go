@@ -8,8 +8,8 @@ import (
 
 
 
-func ScrapePage() ([]news, error) {
-	doc, err := GetCnetHtml()
+func ScrapeCnet() ([]news, error) {
+	doc, err := getCnetHtml()
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func ScrapePage() ([]news, error) {
 	return listOfNews[:5], nil
 }
 
-func GetCnetHtml() (*goquery.Document, error) {
+func getCnetHtml() (*goquery.Document, error) {
 	client := &http.Client{}
 	url := "https://www.cnet.com/tech/"
 	req, err := http.NewRequest("GET", url, nil)

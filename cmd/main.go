@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	log.Println(websites.ScrapePage())
+	log.Println(websites.ScrapeCnet())
 }
