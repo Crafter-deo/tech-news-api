@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ScrapeCodingdojo() []news{
+func ScrapeCodingdojo() []news {
 	doc, err := getCodingdojoHtml()
 
 	if err != nil {

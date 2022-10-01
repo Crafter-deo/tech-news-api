@@ -6,8 +6,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-
-
 func ScrapeCnet() ([]news, error) {
 	doc, err := getCnetHtml()
 	if err != nil {
