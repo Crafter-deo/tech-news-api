@@ -6,17 +6,17 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ScrapeCodingdojo() []news {
+func ScrapeCodingdojo() []Blogs {
 	doc, err := getCodingdojoHtml()
 
 	if err != nil {
 		return nil
 	}
 
-	var listOfNews []news
+	var listOfNews []Blogs
 
 	doc.Find("div.archive-post-wrap").Each(func(i int, s *goquery.Selection) {
-		var topicCard news
+		var topicCard Blogs
 		topicCard.Headline = s.Find("header h1 a").Text()
 		topicCard.Url, _ = s.Find("header h1 a").Attr("href")
 		topicCard.Site = "Codingdojo"

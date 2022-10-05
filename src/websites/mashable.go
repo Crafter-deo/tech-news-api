@@ -7,20 +7,20 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ScrapeMashable() []news {
+func ScrapeMashable() []Blogs {
 
 	doc, err := getMashableHtml()
 	if err != nil {
 		return nil
 	}
-	var listOfNews []news
+	var listOfNews []Blogs
 
 	filterMashabledivs := func(i int, s *goquery.Selection) bool {
 		return strings.TrimSpace(s.Find("h2.font-bold.header-200").Text()) == "Latest"
 	}
 
 	doc.Find("div.max-w-8xl.px-4.mx-auto.pb-8.mt-12").FilterFunction(filterMashabledivs).Find("div.flex-1").Each(func(i int, s *goquery.Selection) {
-		topicCard := news{}
+		topicCard := Blogs{}
 		baseUrl := "https://mashable.com"
 		topicCard.Headline = s.Find("div.flex-1 a.block.w-full.text-lg.font-bold.leading-6.mt-2").Text()
 		href, _ := s.Find("div.flex-1 a.block.w-full.text-lg.font-bold.leading-6.mt-2").Attr("href")

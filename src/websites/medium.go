@@ -6,15 +6,15 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ScrapeMedium() []news {
+func ScrapeMedium() []Blogs {
 	doc, err := getMediumHtml()
 	if err != nil {
 		return nil
 	}
 
-	var listOfNews []news
+	var listOfNews []Blogs
 	doc.Find("div.kp.l").Each(func(i int, s *goquery.Selection) {
-		var topicCard news
+		var topicCard Blogs
 		baseUrl := "https://medium.com"
 		href, _ := s.Find(`a[aria-label="Post Preview Title"]`).Attr("href")
 		topicCard.Url = baseUrl + href

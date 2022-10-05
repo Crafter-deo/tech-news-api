@@ -6,16 +6,16 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ScrapeDigitaltrends() []news {
+func ScrapeDigitaltrends() []Blogs {
 	doc, err := getDigitaltrendsHtml()
 	if err != nil {
 		return nil
 	}
 
-	listOfNews := []news{}
+	listOfNews := []Blogs{}
 
 	doc.Find("div.b-tabbed-lists__items.h-tabbed-lists-list.is-active div.b-tabbed-lists__item").Each(func(i int, s *goquery.Selection) {
-		topicCard := news{}
+		topicCard := Blogs{}
 
 		topicCard.Headline = s.Find("h3 a").Text()
 		topicCard.Url, _ = s.Find("h3 a").Attr("href")

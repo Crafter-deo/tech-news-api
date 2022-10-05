@@ -6,15 +6,15 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ScrapeCnet() ([]news, error) {
+func ScrapeCnet() []Blogs {
 	doc, err := getCnetHtml()
 	if err != nil {
-		return nil, err
+		return nil
 	}
-	var listOfNews []news
+	var listOfNews []Blogs
 	baseUrl := "https://www.cnet.com"
 	doc.Find("div.o-card.c-premiumCards_card").Each(func(i int, selection *goquery.Selection) {
-		topicCard := news{}
+		topicCard := Blogs{}
 		topicCard.Headline = selection.Find("h3.c-premiumCards_title").Text()
 		href, _ := selection.Find("a.o-linkOverlay").Attr("href")
 		topicCard.Url = baseUrl + href
@@ -22,7 +22,7 @@ func ScrapeCnet() ([]news, error) {
 		listOfNews = append(listOfNews, topicCard)
 	})
 
-	return listOfNews[:5], nil
+	return listOfNews[:5]
 }
 
 func getCnetHtml() (*goquery.Document, error) {

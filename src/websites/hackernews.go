@@ -6,16 +6,16 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ScrapeHackernews() []news {
+func ScrapeHackernews() []Blogs {
 	doc, err := getHackernewsHtml()
 	if err != nil {
 		return nil
 	}
 
-	var listOfNews []news
+	var listOfNews []Blogs
 
 	doc.Find("span.titleline").Each(func(i int, s *goquery.Selection) {
-		topicCard := news{}
+		topicCard := Blogs{}
 
 		topicCard.Headline = s.Find("a").Text()
 		topicCard.Url, _ = s.Find("a").Attr("href")
