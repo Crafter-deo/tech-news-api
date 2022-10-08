@@ -2,7 +2,10 @@ package main
 
 import (
 	// "log"
+	"encoding/json"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/Crafter-deo/tech-trends-api/src/websites"
 	"github.com/gin-gonic/gin"
@@ -44,4 +47,18 @@ func main() {
 		ctx.JSON(http.StatusOK, all_blogs)
 	})
 	router.Run()
+}
+
+
+func loadSites() []string {
+	file, err := os.ReadFile("../src/websites/websites.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	var sites []string
+	err = json.Unmarshal(file, &sites)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return sites
 }
