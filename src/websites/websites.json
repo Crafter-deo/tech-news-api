@@ -1,0 +1,28 @@
+{
+    "sites": [
+        {
+            "name": "cnet",
+            "start_function": "ScrapeCnet"
+        },
+        {
+            "name": "codingdojo",
+            "start_function": "ScrapeCodingdojo"
+        },
+        {
+            "name": "digitaltrends",
+            "start_function": "ScrapeDigitaltrends"
+        },
+        {
+            "name": "hackernews",
+            "start_function": "ScrapeHackernews"
+        },
+        {
+            "name": "mashable",
+            "start_function": "ScrapeMashable"
+        },
+        {
+            "name": "medium",
+            "start_function": "ScrapeMedium"
+        }
+    ]
+}
