@@ -15,16 +15,20 @@ func ScrapeCodingdojo() []Blogs {
 
 	var listOfNews []Blogs
 
-	doc.Find("div.archive-post-wrap").Each(func(i int, s *goquery.Selection) {
+	doc.Find("div.jet-smart-listing__post-wrapper").Each(func(i int, s *goquery.Selection) {
 		var topicCard Blogs
-		topicCard.Headline = s.Find("header h1 a").Text()
-		topicCard.Url, _ = s.Find("header h1 a").Attr("href")
+		topicCard.Headline = s.Find("div.jet-smart-listing__post-title.post-title-simple a").Text()
+		topicCard.Url, _ = s.Find("div.jet-smart-listing__post-title.post-title-simple a").Attr("href")
 		topicCard.Site = "Codingdojo"
 
 		listOfNews = append(listOfNews, topicCard)
 	})
+	if len(listOfNews) > 5 {
+		return listOfNews[:5]
+	} else {
+		return listOfNews
+	}
 
-	return listOfNews
 }
 
 func getCodingdojoHtml() (*goquery.Document, error) {
