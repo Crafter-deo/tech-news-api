@@ -14,7 +14,7 @@ func ScrapeDigitaltrends() []Blogs {
 
 	listOfNews := []Blogs{}
 
-	doc.Find("div.b-tabbed-lists__items.h-tabbed-lists-list.is-active div.b-tabbed-lists__item").Each(func(i int, s *goquery.Selection) {
+	doc.Find("div.b-mem-post__content").Each(func(i int, s *goquery.Selection) {
 		topicCard := Blogs{}
 
 		topicCard.Headline = s.Find("h3 a").Text()
@@ -25,7 +25,11 @@ func ScrapeDigitaltrends() []Blogs {
 
 	})
 
-	return listOfNews
+	if len(listOfNews) > 5 {
+		return listOfNews[:5]
+	} else {
+		return listOfNews
+	}
 }
 
 func getDigitaltrendsHtml() (*goquery.Document, error) {
