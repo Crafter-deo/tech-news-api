@@ -51,12 +51,10 @@ func main() {
 		blogs := websites.ScrapeCnet()
 		ctx.JSON(http.StatusOK, blogs)
 	})
-	// TODO: not returning blogs, returns null, check scraper
 	router.GET("/codingdojo", func(ctx *gin.Context) {
 		blogs := websites.ScrapeCodingdojo()
 		ctx.JSON(http.StatusOK, blogs)
 	})
-	// TODO: not returning blogs, returns nothing, check scraper
 	router.GET("/digitaltrends", func(ctx *gin.Context) {
 		blogs := websites.ScrapeDigitaltrends()
 		ctx.JSON(http.StatusOK, blogs)
