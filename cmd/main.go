@@ -46,6 +46,34 @@ func main() {
 		}
 		ctx.JSON(http.StatusOK, all_blogs)
 	})
+
+	router.GET("/cnet", func(ctx *gin.Context) {
+		blogs := websites.ScrapeCnet()
+		ctx.JSON(http.StatusOK, blogs)
+	})
+	// TODO: not returning blogs, returns null, check scraper
+	router.GET("/codingdojo", func(ctx *gin.Context) {
+		blogs := websites.ScrapeCodingdojo()
+		ctx.JSON(http.StatusOK, blogs)
+	})
+	// TODO: not returning blogs, returns nothing, check scraper
+	router.GET("/digitaltrends", func(ctx *gin.Context) {
+		blogs := websites.ScrapeDigitaltrends()
+		ctx.JSON(http.StatusOK, blogs)
+	})
+	router.GET("/hackernews", func(ctx *gin.Context) {
+		blogs := websites.ScrapeHackernews()
+		ctx.JSON(http.StatusOK, blogs)
+	})
+	router.GET("/mashable", func(ctx *gin.Context) {
+		blogs := websites.ScrapeMashable()
+		ctx.JSON(http.StatusOK, blogs)
+	})
+	// TODO: not returning blogs, returns null, check scraper
+	router.GET("/medium", func(ctx *gin.Context) {
+		blogs := websites.ScrapeMedium()
+		ctx.JSON(http.StatusOK, blogs)
+	})
 	router.Run()
 }
 
