@@ -1,15 +1,19 @@
 package websites
 
 import (
+	"log"
 	"net/http"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gin-gonic/gin"
 )
 
-func ScrapeHackernews() []Blogs {
+func ScrapeHackernews(ctx *gin.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
 	doc, err := getHackernewsHtml()
 	if err != nil {
-		return nil
+		log.Println("Error parsing document", err)
 	}
 
 	var listOfNews []Blogs
@@ -24,7 +28,7 @@ func ScrapeHackernews() []Blogs {
 		listOfNews = append(listOfNews, topicCard)
 	})
 
-	return listOfNews[:5]
+	ctx.JSON(http.StatusOK, listOfNews[:5])
 }
 
 func getHackernewsHtml() (*goquery.Document, error) {

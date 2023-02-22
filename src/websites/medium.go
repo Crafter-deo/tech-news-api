@@ -13,18 +13,25 @@ func ScrapeMedium() []Blogs {
 	}
 
 	var listOfNews []Blogs
-	doc.Find("div.kp.l").Each(func(i int, s *goquery.Selection) {
+	doc.Find("article.meteredContent").Each(func(i int, s *goquery.Selection) {
 		var topicCard Blogs
 		baseUrl := "https://medium.com"
-		href, _ := s.Find(`a[aria-label="Post Preview Title"]`).Attr("href")
+		href, found := s.Find(`a[aria-label="Post Preview Title"]`).Attr("href")
+		if !found {
+			return
+		}
 		topicCard.Url = baseUrl + href
 		topicCard.Site = "Medium"
 		topicCard.Headline = s.Find("h2").Text()
 		listOfNews = append(listOfNews, topicCard)
 
 	})
-
-	return listOfNews[:5]
+	
+	if len(listOfNews) > 5 {
+		return listOfNews[:5]
+	} else {
+		return listOfNews
+	}
 
 }
 

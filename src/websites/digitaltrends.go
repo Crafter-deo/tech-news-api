@@ -1,15 +1,19 @@
 package websites
 
 import (
+	"log"
 	"net/http"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gin-gonic/gin"
 )
 
-func ScrapeDigitaltrends() []Blogs {
+func ScrapeDigitaltrends(ctx *gin.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
 	doc, err := getDigitaltrendsHtml()
 	if err != nil {
-		return nil
+		log.Println("Error parsing document", err)
 	}
 
 	listOfNews := []Blogs{}
@@ -26,9 +30,9 @@ func ScrapeDigitaltrends() []Blogs {
 	})
 
 	if len(listOfNews) > 5 {
-		return listOfNews[:5]
+		ctx.JSON(http.StatusOK, listOfNews[:5])
 	} else {
-		return listOfNews
+		ctx.JSON(http.StatusOK, listOfNews)
 	}
 }
 

@@ -1,17 +1,20 @@
 package websites
 
 import (
+	"log"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gin-gonic/gin"
 )
 
-func ScrapeMashable() []Blogs {
-
+func ScrapeMashable(ctx *gin.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
 	doc, err := getMashableHtml()
 	if err != nil {
-		return nil
+		log.Println("Error parsing document", err)
 	}
 	var listOfNews []Blogs
 
@@ -30,7 +33,7 @@ func ScrapeMashable() []Blogs {
 		listOfNews = append(listOfNews, topicCard)
 	})
 
-	return listOfNews
+	ctx.JSON(http.StatusOK, listOfNews)
 }
 func getMashableHtml() (*goquery.Document, error) {
 	url := "https://mashable.com/tech"

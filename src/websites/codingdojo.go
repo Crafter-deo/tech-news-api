@@ -1,16 +1,20 @@
 package websites
 
 import (
+	"log"
 	"net/http"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gin-gonic/gin"
 )
 
-func ScrapeCodingdojo() []Blogs {
+func ScrapeCodingdojo(ctx *gin.Context, wg *sync.WaitGroup)  {
+	defer wg.Done()
 	doc, err := getCodingdojoHtml()
 
 	if err != nil {
-		return nil
+		log.Println("Error parsing document", err)
 	}
 
 	var listOfNews []Blogs
@@ -24,9 +28,9 @@ func ScrapeCodingdojo() []Blogs {
 		listOfNews = append(listOfNews, topicCard)
 	})
 	if len(listOfNews) > 5 {
-		return listOfNews[:5]
+		ctx.JSON(http.StatusOK, listOfNews[:5])
 	} else {
-		return listOfNews
+		ctx.JSON(http.StatusOK, listOfNews)
 	}
 
 }

@@ -1,15 +1,19 @@
 package websites
 
 import (
+	"log"
 	"net/http"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gin-gonic/gin"
 )
 
-func ScrapeCnet() []Blogs {
+func ScrapeCnet(ctx *gin.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
 	doc, err := getCnetHtml()
 	if err != nil {
-		return nil
+		log.Println("Error parsing document", err)
 	}
 	var listOfNews []Blogs
 	baseUrl := "https://www.cnet.com"
@@ -22,7 +26,11 @@ func ScrapeCnet() []Blogs {
 		listOfNews = append(listOfNews, topicCard)
 	})
 
-	return listOfNews[:5]
+	if len(listOfNews) > 5 {
+		ctx.JSON(http.StatusOK, listOfNews[:5])
+	} else {
+		ctx.JSON(http.StatusOK, listOfNews)
+	}
 }
 
 func getCnetHtml() (*goquery.Document, error) {
