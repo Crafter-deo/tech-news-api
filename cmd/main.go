@@ -1,90 +1,104 @@
 package main
 
 import (
-	// "log"
-	"encoding/json"
-	"log"
 	"net/http"
-	"os"
+	"sync"
 
-	"github.com/Crafter-deo/tech-trends-api/src/websites"
 	"github.com/gin-gonic/gin"
+	"github.com/sudodeo/tech-news-api/src/websites"
 )
+
+const PORT = ":2222"
 
 func main() {
 	// log.Println(websites.ScrapeCnet())
 	router := gin.Default()
+	wg := &sync.WaitGroup{}
+
+	// Create channels for each website
+	mediumChannel := make(chan []websites.Blogs)
+	mashableChannel := make(chan []websites.Blogs)
+	hackernewsChannel := make(chan []websites.Blogs)
+	digitaltrendsChannel := make(chan []websites.Blogs)
+	codingdojoChannel := make(chan []websites.Blogs)
+	cnetChannel := make(chan []websites.Blogs)
 
 	router.GET("/all", func(ctx *gin.Context) {
-		all_blogs := [][]websites.Blogs{}
-		for _, site := range websites.Sites {
-			switch site {
-			case "cnet":
-				blogs := websites.ScrapeCnet()
-				all_blogs = append(all_blogs, blogs)
 
-			case "codingdojo":
-				blogs := websites.ScrapeCodingdojo()
-				all_blogs = append(all_blogs, blogs)
-
-			case "digitaltrends":
-				blogs := websites.ScrapeDigitaltrends()
-				all_blogs = append(all_blogs, blogs)
-
-			case "hackernews":
-				blogs := websites.ScrapeHackernews()
-				all_blogs = append(all_blogs, blogs)
-
-			case "mashable":
-				blogs := websites.ScrapeMashable()
-				all_blogs = append(all_blogs, blogs)
-
-			case "medium":
-				blogs := websites.ScrapeMedium()
-				all_blogs = append(all_blogs, blogs)
+		// Use a buffered channel to collect all data
+		all_blogs := make(chan []websites.Blogs, 6)
+		wg.Add(6)
+		go websites.ScrapeMedium(wg, mediumChannel)
+		go websites.ScrapeMashable(wg, mashableChannel)
+		go websites.ScrapeHackernews(wg, hackernewsChannel)
+		go websites.ScrapeDigitaltrends(wg, digitaltrendsChannel)
+		go websites.ScrapeCodingdojo(wg, codingdojoChannel)
+		go websites.ScrapeCnet(wg, cnetChannel)
+		wg.Add(1)
+		// Fan-in the scraped data into a single channel
+		go func() {
+			defer wg.Done()
+			for i := 0; i < 6; i++ {
+				select {
+				case data := <-mediumChannel:
+					all_blogs <- data
+				case data := <-mashableChannel:
+					all_blogs <- data
+				case data := <-hackernewsChannel:
+					all_blogs <- data
+				case data := <-digitaltrendsChannel:
+					all_blogs <- data
+				case data := <-codingdojoChannel:
+					all_blogs <- data
+				case data := <-cnetChannel:
+					all_blogs <- data
+				}
 			}
+			close(all_blogs)
+		}()
+
+		// Collect all data from the channel
+		allData := []websites.Blogs{}
+		for data := range all_blogs {
+			allData = append(allData, data...)
 		}
-		ctx.JSON(http.StatusOK, all_blogs)
+		wg.Wait()
+
+		// Return all data as JSON
+		ctx.JSON(http.StatusOK, allData)
 	})
 
 	router.GET("/cnet", func(ctx *gin.Context) {
-		blogs := websites.ScrapeCnet()
-		ctx.JSON(http.StatusOK, blogs)
+		wg.Add(1)
+		go websites.ScrapeCnet(wg, cnetChannel)
+		ctx.JSON(http.StatusOK, <-cnetChannel)
 	})
 	router.GET("/codingdojo", func(ctx *gin.Context) {
-		blogs := websites.ScrapeCodingdojo()
-		ctx.JSON(http.StatusOK, blogs)
+		wg.Add(1)
+		go websites.ScrapeCodingdojo(wg, codingdojoChannel)
+		ctx.JSON(http.StatusOK, <-codingdojoChannel)
 	})
 	router.GET("/digitaltrends", func(ctx *gin.Context) {
-		blogs := websites.ScrapeDigitaltrends()
-		ctx.JSON(http.StatusOK, blogs)
+		wg.Add(1)
+		go websites.ScrapeDigitaltrends(wg, digitaltrendsChannel)
+		ctx.JSON(http.StatusOK, <-digitaltrendsChannel)
 	})
 	router.GET("/hackernews", func(ctx *gin.Context) {
-		blogs := websites.ScrapeHackernews()
-		ctx.JSON(http.StatusOK, blogs)
+		wg.Add(1)
+		go websites.ScrapeHackernews(wg, hackernewsChannel)
+		ctx.JSON(http.StatusOK, <-hackernewsChannel)
 	})
 	router.GET("/mashable", func(ctx *gin.Context) {
-		blogs := websites.ScrapeMashable()
-		ctx.JSON(http.StatusOK, blogs)
+		wg.Add(1)
+		go websites.ScrapeMashable(wg, mashableChannel)
+		ctx.JSON(http.StatusOK, <-mashableChannel)
+
 	})
-	// TODO: not returning blogs, returns null, check scraper
 	router.GET("/medium", func(ctx *gin.Context) {
-		blogs := websites.ScrapeMedium()
-		ctx.JSON(http.StatusOK, blogs)
+		wg.Add(1)
+		go websites.ScrapeMedium(wg, mediumChannel)
+		ctx.JSON(http.StatusOK, <-mediumChannel)
 	})
-	router.Run()
-}
 
-
-func loadSites() []string {
-	file, err := os.ReadFile("../src/websites/websites.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	var sites []string
-	err = json.Unmarshal(file, &sites)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return sites
+	router.Run(PORT)
 }
