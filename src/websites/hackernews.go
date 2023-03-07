@@ -6,10 +6,9 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gin-gonic/gin"
 )
 
-func ScrapeHackernews(ctx *gin.Context, wg *sync.WaitGroup) {
+func ScrapeHackernews(wg *sync.WaitGroup, channel chan<- []Blogs) {
 	defer wg.Done()
 	doc, err := getHackernewsHtml()
 	if err != nil {
@@ -28,7 +27,7 @@ func ScrapeHackernews(ctx *gin.Context, wg *sync.WaitGroup) {
 		listOfNews = append(listOfNews, topicCard)
 	})
 
-	ctx.JSON(http.StatusOK, listOfNews[:5])
+	channel <- listOfNews[:5]
 }
 
 func getHackernewsHtml() (*goquery.Document, error) {

@@ -6,10 +6,9 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gin-gonic/gin"
 )
 
-func ScrapeCodingdojo(ctx *gin.Context, wg *sync.WaitGroup)  {
+func ScrapeCodingdojo(wg *sync.WaitGroup, channel chan<- []Blogs) {
 	defer wg.Done()
 	doc, err := getCodingdojoHtml()
 
@@ -28,9 +27,9 @@ func ScrapeCodingdojo(ctx *gin.Context, wg *sync.WaitGroup)  {
 		listOfNews = append(listOfNews, topicCard)
 	})
 	if len(listOfNews) > 5 {
-		ctx.JSON(http.StatusOK, listOfNews[:5])
+		channel <- listOfNews[:5]
 	} else {
-		ctx.JSON(http.StatusOK, listOfNews)
+		channel <- listOfNews
 	}
 
 }

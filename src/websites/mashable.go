@@ -7,10 +7,9 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gin-gonic/gin"
 )
 
-func ScrapeMashable(ctx *gin.Context, wg *sync.WaitGroup) {
+func ScrapeMashable(wg *sync.WaitGroup, channel chan<- []Blogs) {
 	defer wg.Done()
 	doc, err := getMashableHtml()
 	if err != nil {
@@ -22,19 +21,20 @@ func ScrapeMashable(ctx *gin.Context, wg *sync.WaitGroup) {
 		return strings.TrimSpace(s.Find("h2.font-bold.header-200").Text()) == "Latest"
 	}
 
-	doc.Find("div.max-w-8xl.px-4.mx-auto.pb-8.mt-12").FilterFunction(filterMashabledivs).Find("div.flex-1").Each(func(i int, s *goquery.Selection) {
+	doc.Find("div.px-4.pb-8.mx-auto.mt-12.max-w-8xl").FilterFunction(filterMashabledivs).Find("div.flex-1").Each(func(i int, s *goquery.Selection) {
 		topicCard := Blogs{}
 		baseUrl := "https://mashable.com"
-		topicCard.Headline = s.Find("div.flex-1 a.block.w-full.text-lg.font-bold.leading-6.mt-2").Text()
-		href, _ := s.Find("div.flex-1 a.block.w-full.text-lg.font-bold.leading-6.mt-2").Attr("href")
+		topicCard.Headline = s.Find("div.flex-1 a.block.w-full.text-lg.font-semibold.leading-tight.mt-2").Text()
+		href, _ := s.Find("div.flex-1 a.block.w-full.text-lg.font-semibold.leading-tight.mt-2").Attr("href")
 		topicCard.Url = baseUrl + href
 		topicCard.Site = "Mashable"
 
 		listOfNews = append(listOfNews, topicCard)
 	})
 
-	ctx.JSON(http.StatusOK, listOfNews)
+	channel <- listOfNews
 }
+
 func getMashableHtml() (*goquery.Document, error) {
 	url := "https://mashable.com/tech"
 

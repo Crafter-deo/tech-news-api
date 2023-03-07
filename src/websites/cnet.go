@@ -6,10 +6,9 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gin-gonic/gin"
 )
 
-func ScrapeCnet(ctx *gin.Context, wg *sync.WaitGroup) {
+func ScrapeCnet(wg *sync.WaitGroup, channel chan<- []Blogs) {
 	defer wg.Done()
 	doc, err := getCnetHtml()
 	if err != nil {
@@ -27,9 +26,9 @@ func ScrapeCnet(ctx *gin.Context, wg *sync.WaitGroup) {
 	})
 
 	if len(listOfNews) > 5 {
-		ctx.JSON(http.StatusOK, listOfNews[:5])
+		channel <- listOfNews[:5]
 	} else {
-		ctx.JSON(http.StatusOK, listOfNews)
+		channel <- listOfNews
 	}
 }
 

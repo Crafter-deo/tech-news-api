@@ -2,14 +2,16 @@ package websites
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ScrapeMedium() []Blogs {
+func ScrapeMedium(wg *sync.WaitGroup, channel chan<- []Blogs) {
+	defer wg.Done()
 	doc, err := getMediumHtml()
 	if err != nil {
-		return nil
+		return
 	}
 
 	var listOfNews []Blogs
@@ -26,11 +28,11 @@ func ScrapeMedium() []Blogs {
 		listOfNews = append(listOfNews, topicCard)
 
 	})
-	
+
 	if len(listOfNews) > 5 {
-		return listOfNews[:5]
+		channel <- listOfNews[:5]
 	} else {
-		return listOfNews
+		channel <- listOfNews
 	}
 
 }
