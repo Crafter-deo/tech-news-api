@@ -13,4 +13,4 @@ var Sites = []string{"cnet", "codingdojo", "digitaltrends", "hackernews", "masha
 * https://digg.com/technology
 * https://www.techradar.com/best
 * https://www.theverge.com/ ???????
-*/
+ */
